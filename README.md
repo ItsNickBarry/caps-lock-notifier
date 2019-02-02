@@ -6,4 +6,4 @@ Hovering over a password field while the icon is present will display `CAPS LOCK
 
 Install for Firefox [here](https://addons.mozilla.org/addon/caps-lock-notifier/).
 
-![example](./example.png)
+![example](./example.png 'obviously my password is "password"')
