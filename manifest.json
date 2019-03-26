@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Caps Lock Notifier",
-  "version": "1.0.0",
+  "version": "1.1.0",
 
   "description": "Add an icon to password fields to indicate whether caps lock is on.",
 

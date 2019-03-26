@@ -1,8 +1,6 @@
 const ICON = '⚠️';
 
-let isPasswordTarget = function (e) {
-  return e.target.nodeName === 'INPUT' && e.target.type === 'password';
-};
+let capsLockState;
 
 let backgrounds = {};
 
@@ -22,7 +20,7 @@ let getBackground = function (height) {
   return backgrounds[height];
 };
 
-let setAttributes = function (element) {
+let setStyle = function (element) {
   if (!element._caps_lock_notifier_backup) {
     element._caps_lock_notifier_backup = [
       element.style['background-image'],
@@ -37,7 +35,7 @@ let setAttributes = function (element) {
   element.title = 'CAPS LOCK is on!'
 };
 
-let restoreAttributes = function (element) {
+let restoreStyle = function (element) {
   let backup = element._caps_lock_notifier_backup;
   if (backup) {
     element.style['background-image'] = backup[0];
@@ -47,15 +45,37 @@ let restoreAttributes = function (element) {
   }
 };
 
-let handler = function (e) {
-  if (isPasswordTarget(e) && e.getModifierState('CapsLock')) {
-    setAttributes(e.target);
-  } else {
-    restoreAttributes(e.target);
+let setCapsLockState = function (state) {
+  if (capsLockState !== state) {
+    capsLockState = state;
+
+    document.querySelectorAll('input').forEach(function (el) {
+      if (el.type === 'password') {
+        if (capsLockState) {
+          setStyle(el);
+        } else {
+          restoreStyle(el);
+        }
+      }
+    });
   }
 };
 
-// register event when selecting a password input element
-document.addEventListener('click', handler);
-// register event when caps lock is pressed
-document.addEventListener('keyup', handler);
+// check for changes to state while page is in background
+document.addEventListener('click', function (e) {
+  setCapsLockState(e.getModifierState('CapsLock'));
+});
+
+// register event when any key is pressed
+document.addEventListener('keyup', function (e) {
+  if (e.key === 'CapsLock') {
+    // getModifierState is always true if key is CapsLock
+    // therefore, toggle, but only if state has previously been set
+    if (typeof capsLockState !== 'undefined') {
+      setCapsLockState(!capsLockState);
+    }
+  } else {
+    // getModifierState can be trusted if key is not CapsLock
+    setCapsLockState(e.getModifierState('CapsLock'));
+  }
+});
